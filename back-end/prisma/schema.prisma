@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Categoria {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome       String
+  livros     Livro[]
+}
+
+model Usuario {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  nome            String
+  email           String        @unique
+  cpf             String        @unique
+  data_nascimento DateTime?
+  endereco        String
+  telefone        String
+  emprestimos     Emprestimo[]
+}
+
+model Livro {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  titulo         String
+  autor          String
+  editora        String
+  ano_publicacao Int
+  categoria_id   String        @db.ObjectId
+  categoria      Categoria     @relation(fields: [categoria_id], references: [id])
+  emprestimos    Emprestimo[]
+}
+
+model Emprestimo {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  data_inicio  DateTime   @default(now())
+  data_fim     DateTime?
+  devolvido    Boolean    @default(false)
+  livro_id     String     @db.ObjectId
+  livro        Livro      @relation(fields: [livro_id], references: [id])
+  usuario_id   String     @db.ObjectId
+  usuario      Usuario    @relation(fields: [usuario_id], references: [id])
+}
